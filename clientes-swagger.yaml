@@ -1,0 +1,130 @@
+swagger: "2.0"
+info:
+  description: "This is the API for Acme AP Cliente Service"
+  version: "1.0.0"
+  title: "Acme AP Cliente Service"
+  contact:
+    email: "alexandre.zanelatto@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "cliente.acme.com.br"
+basePath: "/v1"
+tags:
+- name: "cliente"
+  description: "Everything about your Clientes"
+schemes:
+- "https"
+- "http"
+paths:
+  /clientes:
+    post:
+      tags:
+      - "clientes"
+      summary: "Create a new cliente"
+      description: ""
+      operationId: "criarCliente"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Cliente object that needs to be added to the Cliente database"
+        required: true
+        schema:
+          $ref: "#/definitions/Cliente"
+      responses:
+        "404":
+          description: "Bad Request"
+      security:
+      - acme_auth:
+        - "write:clientes"
+        - "read:clientes"
+    get:
+      tags:
+      - "clientes"
+      summary: "Finds all clientes"
+      operationId: "getAllClientes"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Cliente"
+      security:
+      - acme_auth:
+        - "read:clientes"
+  /clientes/{cpf}:
+    get:
+      tags:
+      - "clientes"
+      summary: "Find Cliente by CPF"
+      operationId: "getClienteByCpf"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "cpf"
+        in: "path"
+        description: "CPF of the desired cliente to find"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+        "400":
+          description: "Invalid status value"
+      security:
+      - acme_auth:
+        - "read:clientes"
+securityDefinitions:
+  acme_auth:
+    type: "oauth2"
+    authorizationUrl: "http://auth.acme.com.br/oauth"
+    flow: "implicit"
+    scopes:
+      write:clientes: "modify clientes in your account"
+      read:clientes: "read your clientes"
+definitions:
+  Endereco:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      logradouro:
+        type: "string"
+      numero:
+        type: "integer"
+        format: "int64"
+      bairro:
+        type: "string"
+      cidade:
+        type: "string"
+      uf:
+        type: "string"
+  Cliente:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      enderecoCobranca:
+        $ref: "#/definitions/Endereco"
+      listaInstalacaoId:
+        type: "array"
+        items:
+          type: "integer"
+          format: "int64"
+      nome:
+        type: "string"
+      cpf:
+        type: "string"
+      dataNascimento:
+        type: "string"
